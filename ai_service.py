@@ -21,12 +21,17 @@ def generate_content(text: str) -> VideoContent:
             logger.error("OpenRouter API key not found in environment variables")
             raise Exception("OpenRouter API key not configured. Please set the OPENROUTER_API_KEY environment variable.")
 
+        # OpenRouter requires these specific headers
         headers = {
             "Authorization": f"Bearer {API_KEY}",
             "Content-Type": "application/json",
-            "HTTP-Referer": "https://replit.com",  # Required by OpenRouter
+            "HTTP-Referer": "${REPL_SLUG}.repl.co",  # Required by OpenRouter
             "X-Title": "AI Video Generator",  # Optional but recommended
         }
+
+        # Log the request details (excluding the API key)
+        logger.debug(f"Making API request to: {API_URL}")
+        logger.debug(f"Using model: {MODEL}")
 
         data = {
             "model": MODEL,
@@ -52,6 +57,10 @@ def generate_content(text: str) -> VideoContent:
 
         logger.debug("Making API request to OpenRouter")
         response = requests.post(API_URL, headers=headers, json=data)
+
+        # Log the response status and some details
+        logger.debug(f"Response status code: {response.status_code}")
+        logger.debug(f"Response headers: {response.headers}")
 
         if response.status_code != 200:
             error_message = f"API request failed with status {response.status_code}"
