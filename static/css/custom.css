@@ -1,0 +1,24 @@
+/* Minimal custom styles to complement Bootstrap dark theme */
+.progress {
+    height: 25px;
+}
+
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.loading-spinner {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Dark theme specific overrides */
+[data-bs-theme=dark] .form-control:focus {
+    background-color: var(--bs-gray-800);
+    border-color: var(--bs-primary);
+}
+
+[data-bs-theme=dark] .progress {
+    background-color: var(--bs-gray-800);
+}

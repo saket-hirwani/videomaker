@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <h1 class="mb-4">Create Explanatory Videos</h1>
+    
+    <div class="card bg-dark mb-4">
+        <div class="card-body">
+            <form id="videoForm">
+                <div class="mb-3">
+                    <label for="topic" class="form-label">Enter your topic</label>
+                    <textarea 
+                        class="form-control"
+                        id="topic"
+                        name="topic"
+                        rows="3"
+                        required
+                        placeholder="Enter the topic you want to create a video about..."
+                    ></textarea>
+                </div>
+                
+                <div class="progress mb-3 d-none">
+                    <div id="progressBar"
+                         class="progress-bar progress-bar-striped progress-bar-animated"
+                         role="progressbar"
+                         aria-valuenow="0"
+                         aria-valuemin="0"
+                         aria-valuemax="100">
+                    </div>
+                </div>
+                
+                <p id="progressText" class="text-muted d-none">
+                    Initializing...
+                </p>
+                
+                <button 
+                    type="submit"
+                    id="submitButton"
+                    class="btn btn-primary">
+                    Generate Video
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card bg-dark">
+        <div class="card-body">
+            <h5 class="card-title">How it works</h5>
+            <ol class="card-text">
+                <li>Enter your desired topic in the text area above</li>
+                <li>Our AI will generate educational content about the topic</li>
+                <li>The content will be converted to speech and combined with visuals</li>
+                <li>Download your completed explanatory video</li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}
