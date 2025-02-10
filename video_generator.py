@@ -2,28 +2,11 @@ import os
 import logging
 import tempfile
 from models import VideoContent
+from moviepy.editor import ColorClip, AudioFileClip, concatenate_videoclips
+from gtts import gTTS
 
 logger = logging.getLogger(__name__)
-
-# Configure detailed logging
 logging.basicConfig(level=logging.DEBUG)
-logger.info("Starting video generator module")
-
-try:
-    logger.info("Importing moviepy.editor")
-    from moviepy.editor import TextClip, ColorClip, concatenate_videoclips, AudioFileClip
-    logger.info("Successfully imported moviepy.editor")
-except ImportError as e:
-    logger.error(f"Failed to import moviepy.editor: {str(e)}")
-    raise
-
-try:
-    logger.info("Importing gTTS")
-    from gtts import gTTS
-    logger.info("Successfully imported gTTS")
-except ImportError as e:
-    logger.error(f"Failed to import gTTS: {str(e)}")
-    raise
 
 current_progress = {'value': 0, 'status': 'idle'}
 
@@ -36,23 +19,8 @@ def create_video(content: VideoContent):
         current_progress['value'] = 0
 
         clips = []
-        temp_files = []  # Track temporary files for cleanup
+        temp_files = []
 
-        # Create title slide with simplified text settings
-        logger.info("Creating title slide")
-        title_clip = TextClip(
-            txt=content.title,
-            fontsize=70,
-            color='white',
-            size=(1920, 1080),
-            bg_color='black',
-            method='caption',
-            font='Arial',  # Using a common system font
-            stroke_color='none'
-        ).set_duration(5)
-        clips.append(title_clip)
-
-        # Create section clips
         total_sections = len(content.sections)
         for idx, section in enumerate(content.sections):
             try:
@@ -69,22 +37,10 @@ def create_video(content: VideoContent):
                 # Get audio duration
                 audio_clip = AudioFileClip(temp_audio.name)
                 duration = audio_clip.duration
-                audio_clip.close()
 
-                # Create text clip with matching duration and simplified settings
-                text_clip = TextClip(
-                    txt=section['text'],
-                    fontsize=40,
-                    color='white',
-                    size=(1920, 1080),
-                    bg_color='black',
-                    method='caption',
-                    font='Arial',  # Using a common system font
-                    stroke_color='none'
-                ).set_duration(duration)
-
-                # Add audio to text clip
-                video_clip = text_clip.set_audio(AudioFileClip(temp_audio.name))
+                # Create simple background clip
+                bg_clip = ColorClip(size=(1280, 720), color=(0, 0, 0))
+                video_clip = bg_clip.set_duration(duration).set_audio(audio_clip)
                 clips.append(video_clip)
 
             except Exception as e:
