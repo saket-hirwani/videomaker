@@ -2,14 +2,21 @@ import os
 import logging
 from flask import Flask, render_template, request, jsonify, send_file
 from werkzeug.utils import secure_filename
-import ai_service
-import video_generator
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 logger.info("Starting Flask application")
+
+try:
+    logger.info("Importing application modules")
+    import ai_service
+    import video_generator
+    logger.info("Successfully imported application modules")
+except Exception as e:
+    logger.error(f"Failed to import modules: {str(e)}", exc_info=True)
+    raise
 
 # Initialize Flask app
 app = Flask(__name__)
