@@ -1,44 +1,87 @@
+import os
+import json
 import logging
+import requests
 from models import VideoContent
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+API_URL = "https://openrouter.ai/api/v1/chat/completions"
+API_KEY = os.environ.get("OPENROUTER_API_KEY")
+MODEL = "google/gemini-2.0-flash-lite-preview-02-05:free"
+
 def generate_content(text: str) -> VideoContent:
-    """Format user's input text for video creation."""
+    """Generate video content structure from user's text input."""
     try:
         logger.info(f"Processing text input: {text}")
 
-        # Split text into manageable segments (2-3 sentences each)
-        sentences = [s.strip() for s in text.split('.') if s.strip()]
-        sections = []
-        current_section = []
+        if not API_KEY:
+            logger.error("OpenRouter API key not found in environment variables")
+            raise Exception("OpenRouter API key not configured. Please set the OPENROUTER_API_KEY environment variable.")
 
-        for sentence in sentences:
-            current_section.append(sentence)
-            if len(current_section) >= 2:
-                sections.append({
-                    "text": '. '.join(current_section) + '.'
-                })
-                current_section = []
-
-        # Add any remaining sentences
-        if current_section:
-            sections.append({
-                "text": '. '.join(current_section) + '.'
-            })
-
-        # Create video content structure
-        content = {
-            "title": text[:50] + "..." if len(text) > 50 else text,
-            "sections": sections,
-            "summary": text[:100] + "..." if len(text) > 100 else text
+        # OpenRouter requires these specific headers
+        headers = {
+            "Authorization": f"Bearer {API_KEY}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "${REPL_SLUG}.repl.co",  # Required by OpenRouter
+            "X-Title": "AI Video Generator",  # Optional but recommended
         }
 
-        logger.info("Successfully formatted content")
+        # Log the request details (excluding the API key)
+        logger.debug(f"Making API request to: {API_URL}")
+        logger.debug(f"Using model: {MODEL}")
+
+        data = {
+            "model": MODEL,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": """Convert the given text into a video script format.
+                    Format the response as JSON with the following structure:
+                    {
+                        "title": "Brief title based on the content",
+                        "sections": [
+                            {
+                                "text": "A portion of the text optimized for video narration"
+                            }
+                        ],
+                        "summary": "Brief description of the content"
+                    }
+                    Break the text into natural speaking segments of 2-3 sentences each."""
+                },
+                {"role": "user", "content": text}
+            ]
+        }
+
+        logger.debug("Making API request to OpenRouter")
+        response = requests.post(API_URL, headers=headers, json=data)
+
+        # Log the response status and some details
+        logger.debug(f"Response status code: {response.status_code}")
+        logger.debug(f"Response headers: {response.headers}")
+
+        if response.status_code != 200:
+            error_message = f"API request failed with status {response.status_code}"
+            try:
+                error_details = response.json()
+                error_message += f": {error_details.get('error', {}).get('message', response.text)}"
+            except:
+                error_message += f": {response.text}"
+            logger.error(error_message)
+            raise Exception(error_message)
+
+        content = json.loads(response.json()['choices'][0]['message']['content'])
+        logger.info("Successfully generated content")
         return VideoContent(**content)
 
+    except requests.exceptions.RequestException as e:
+        logger.error(f"API request failed: {str(e)}", exc_info=True)
+        raise Exception(f"Failed to connect to AI service: {str(e)}")
+    except json.JSONDecodeError as e:
+        logger.error(f"Failed to parse API response: {str(e)}", exc_info=True)
+        raise Exception("Failed to parse AI response")
     except Exception as e:
-        logger.error(f"Error formatting content: {str(e)}", exc_info=True)
-        raise Exception(f"Failed to process text: {str(e)}")
+        logger.error(f"Unexpected error in content generation: {str(e)}", exc_info=True)
+        raise Exception(f"Failed to generate content: {str(e)}")

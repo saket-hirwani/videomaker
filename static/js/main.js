@@ -55,9 +55,6 @@ document.addEventListener('DOMContentLoaded', function() {
     async function checkProgress() {
         try {
             const response = await fetch('/progress');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
             const data = await response.json();
             
             progressBar.style.width = `${data.progress}%`;
@@ -66,14 +63,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (data.progress >= 100) {
                 clearInterval(progressInterval);
-                progressBar.classList.add('d-none');
-                progressText.classList.add('d-none');
             }
         } catch (error) {
             console.error('Error checking progress:', error);
-            clearInterval(progressInterval);
-            progressText.textContent = 'Error checking progress';
-            progressBar.classList.add('bg-danger');
         }
     }
     
