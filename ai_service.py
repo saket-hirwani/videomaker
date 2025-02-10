@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
-API_KEY = "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"
+API_KEY = os.environ.get("OPENROUTER_API_KEY", "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")
 MODEL = "google/gemini-2.0-flash-lite-preview-02-05:free"
 
 def generate_content(topic: str) -> VideoContent:
@@ -20,8 +20,8 @@ def generate_content(topic: str) -> VideoContent:
         headers = {
             "Authorization": f"Bearer {API_KEY}",
             "Content-Type": "application/json",
-            "HTTP-Referer": "https://localhost:5000",  # Required by OpenRouter
-            "X-Title": "AI Video Generator"  # Optional but recommended
+            "HTTP-Referer": "https://replit.com",  # Required by OpenRouter
+            "X-Title": "AI Video Generator",  # Optional but recommended
         }
 
         data = {
@@ -48,7 +48,10 @@ def generate_content(topic: str) -> VideoContent:
 
         logger.debug("Making API request to OpenRouter")
         response = requests.post(API_URL, headers=headers, json=data)
-        response.raise_for_status()
+
+        if response.status_code != 200:
+            logger.error(f"API request failed with status {response.status_code}: {response.text}")
+            raise Exception(f"API request failed with status {response.status_code}")
 
         content = json.loads(response.json()['choices'][0]['message']['content'])
         logger.info("Successfully generated content")
