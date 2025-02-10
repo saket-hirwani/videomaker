@@ -2,23 +2,23 @@
 
 {% block content %}
 <div class="form-container">
-    <h1 class="mb-4">Create Explanatory Videos</h1>
-    
+    <h1 class="mb-4">Text to Video Generator</h1>
+
     <div class="card bg-dark mb-4">
         <div class="card-body">
             <form id="videoForm">
                 <div class="mb-3">
-                    <label for="topic" class="form-label">Enter your topic</label>
+                    <label for="topic" class="form-label">Enter your text</label>
                     <textarea 
                         class="form-control"
                         id="topic"
                         name="topic"
-                        rows="3"
+                        rows="4"
                         required
-                        placeholder="Enter the topic you want to create a video about..."
+                        placeholder="Enter the text you want to convert into a video..."
                     ></textarea>
                 </div>
-                
+
                 <div class="progress mb-3 d-none">
                     <div id="progressBar"
                          class="progress-bar progress-bar-striped progress-bar-animated"
@@ -28,11 +28,11 @@
                          aria-valuemax="100">
                     </div>
                 </div>
-                
+
                 <p id="progressText" class="text-muted d-none">
                     Initializing...
                 </p>
-                
+
                 <button 
                     type="submit"
                     id="submitButton"
@@ -42,15 +42,15 @@
             </form>
         </div>
     </div>
-    
+
     <div class="card bg-dark">
         <div class="card-body">
             <h5 class="card-title">How it works</h5>
             <ol class="card-text">
-                <li>Enter your desired topic in the text area above</li>
-                <li>Our AI will generate educational content about the topic</li>
-                <li>The content will be converted to speech and combined with visuals</li>
-                <li>Download your completed explanatory video</li>
+                <li>Enter the text you want to convert into a video</li>
+                <li>Our AI will process your text and create a narrative</li>
+                <li>The text will be converted to speech with matching visuals</li>
+                <li>Download your completed video</li>
             </ol>
         </div>
     </div>

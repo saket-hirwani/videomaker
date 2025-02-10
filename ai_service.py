@@ -12,10 +12,10 @@ API_URL = "https://openrouter.ai/api/v1/chat/completions"
 API_KEY = os.environ.get("OPENROUTER_API_KEY")
 MODEL = "google/gemini-2.0-flash-lite-preview-02-05:free"
 
-def generate_content(topic: str) -> VideoContent:
-    """Generate video content structure using Google Gemini."""
+def generate_content(text: str) -> VideoContent:
+    """Generate video content structure from user's text input."""
     try:
-        logger.info(f"Generating content for topic: {topic}")
+        logger.info(f"Processing text input: {text}")
 
         if not API_KEY:
             logger.error("OpenRouter API key not found in environment variables")
@@ -33,20 +33,20 @@ def generate_content(topic: str) -> VideoContent:
             "messages": [
                 {
                     "role": "system",
-                    "content": """Create an educational video script about the given topic. 
+                    "content": """Convert the given text into a video script format.
                     Format the response as JSON with the following structure:
                     {
-                        "title": "Topic Title",
+                        "title": "Brief title based on the content",
                         "sections": [
                             {
-                                "title": "Section Title",
-                                "text": "Section Content"
+                                "text": "A portion of the text optimized for video narration"
                             }
                         ],
-                        "summary": "Brief summary of the topic"
-                    }"""
+                        "summary": "Brief description of the content"
+                    }
+                    Break the text into natural speaking segments of 2-3 sentences each."""
                 },
-                {"role": "user", "content": f"Create a video script about: {topic}"}
+                {"role": "user", "content": text}
             ]
         }
 
