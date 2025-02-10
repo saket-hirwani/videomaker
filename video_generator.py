@@ -5,7 +5,7 @@ from models import VideoContent
 
 logger = logging.getLogger(__name__)
 
-# Configure detailed logging for imports
+# Configure detailed logging
 logging.basicConfig(level=logging.DEBUG)
 logger.info("Starting video generator module")
 
@@ -38,16 +38,18 @@ def create_video(content: VideoContent):
         clips = []
         temp_files = []  # Track temporary files for cleanup
 
-        # Create title slide
+        # Create title slide with simplified text settings
         logger.info("Creating title slide")
         title_clip = TextClip(
-            content.title,
+            txt=content.title,
             fontsize=70,
             color='white',
             size=(1920, 1080),
             bg_color='black',
-            method='caption'
-        ).set_duration(5)  # Fixed duration for title
+            method='caption',
+            font='Arial',  # Using a common system font
+            stroke_color='none'
+        ).set_duration(5)
         clips.append(title_clip)
 
         # Create section clips
@@ -69,14 +71,16 @@ def create_video(content: VideoContent):
                 duration = audio_clip.duration
                 audio_clip.close()
 
-                # Create text clip with matching duration
+                # Create text clip with matching duration and simplified settings
                 text_clip = TextClip(
-                    section['text'],
+                    txt=section['text'],
                     fontsize=40,
                     color='white',
                     size=(1920, 1080),
                     bg_color='black',
-                    method='caption'
+                    method='caption',
+                    font='Arial',  # Using a common system font
+                    stroke_color='none'
                 ).set_duration(duration)
 
                 # Add audio to text clip
